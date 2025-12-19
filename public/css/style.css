@@ -1,0 +1,378 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+header h1 {
+    font-size: 2em;
+    font-weight: 700;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.balance {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+main {
+    padding: 30px;
+}
+
+.canvas-container {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+#canvas, #replayCanvas {
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    background: white;
+    cursor: crosshair;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.canvas-info {
+    margin-top: 15px;
+    color: #666;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    .controls {
+        grid-template-columns: 1fr;
+    }
+}
+
+.color-picker-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.color-picker-container label {
+    font-weight: 600;
+    color: #555;
+}
+
+#colorPicker {
+    width: 100%;
+    height: 50px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.purchase-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.pixel-packs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.pack-btn {
+    background: white;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.pack-btn:hover {
+    background: #667eea;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.pack-size {
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.pack-price {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.pack-btn:hover .pack-price {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content label {
+    font-weight: 600;
+    color: #555;
+}
+
+.modal-content input[type="password"] {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.modal-content input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.modal-buttons .btn {
+    flex: 1;
+}
+
+.message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Login Page */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.login-container h1 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.login-container p {
+    margin-bottom: 30px;
+    color: #666;
+}
+
+/* Replay Page */
+.replay-container {
+    text-align: center;
+}
+
+.replay-controls {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.control-group label {
+    font-weight: 600;
+    color: #555;
+}
+
+.control-group input[type="range"] {
+    flex: 1;
+    max-width: 300px;
+}
+
+#speedDisplay {
+    min-width: 50px;
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.replay-info {
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.replay-info p {
+    font-weight: 500;
+    color: #555;
+}
+
+.replay-info strong {
+    color: #667eea;
+}
+

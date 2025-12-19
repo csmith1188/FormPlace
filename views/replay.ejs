@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replay - r/place Clone</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Canvas Replay</h1>
+            <a href="/" class="btn btn-secondary">Back to Canvas</a>
+        </header>
+
+        <main>
+            <div class="replay-container">
+                <canvas id="replayCanvas" width="128" height="64"></canvas>
+                
+                <div class="replay-controls">
+                    <div class="control-group">
+                        <button id="playPauseBtn" class="btn btn-primary">Play</button>
+                        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="speedSlider">Speed:</label>
+                        <input type="range" id="speedSlider" min="0.5" max="10" step="0.5" value="1">
+                        <span id="speedDisplay">1x</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="timeSlider">Time:</label>
+                        <input type="range" id="timeSlider" min="0" max="100" value="0" step="1">
+                    </div>
+
+                    <div class="replay-info">
+                        <p>Timestamp: <span id="timestampDisplay">--</span></p>
+                        <p>Pixels placed: <span id="pixelCount">0</span> / <span id="totalPixels"><%= pixels.length %></span></p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const pixels = <%- JSON.stringify(pixels) %>;
+    </script>
+    <script src="/js/replay.js"></script>
+</body>
+</html>
+

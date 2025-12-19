@@ -1,0 +1,25 @@
+{
+  "name": "place-clone",
+  "version": "1.0.0",
+  "description": "Reddit r/place clone with Formbar authentication",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "sqlite3": "^5.1.6",
+    "express-session": "^1.17.3",
+    "connect-sqlite3": "^0.9.13",
+    "jsonwebtoken": "^9.0.2",
+    "socket.io": "^4.6.1",
+    "socket.io-client": "^4.6.1",
+    "dotenv": "^16.3.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+
