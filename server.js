@@ -18,6 +18,7 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 const AUTH_URL = process.env.AUTH_URL || 'https://formbar.yorktechapps.com';
+const THIS_URL = process.env.THIS_URL || `http://localhost:${PORT}`;
 const API_KEY = process.env.API_KEY || '';
 const APP_ACCOUNT_ID = parseInt(process.env.APP_ACCOUNT_ID || '0'); // Formbar account ID to receive digipogs
 
@@ -286,7 +287,7 @@ async function startServer() {
         await initDB();
         server.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
-            console.log(`Visit http://localhost:${PORT} to use the application`);
+            console.log(`Visit ${THIS_URL} to use the application`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);

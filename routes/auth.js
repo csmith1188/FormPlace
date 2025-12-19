@@ -6,7 +6,14 @@ const router = express.Router();
 
 // Get AUTH_URL and THIS_URL from environment
 const AUTH_URL = process.env.AUTH_URL || 'https://formbar.yorktechapps.com';
-const THIS_URL = process.env.THIS_URL || `http://localhost:${process.env.PORT || 3000}/login`;
+const THIS_URL = process.env.THIS_URL || `http://localhost:${process.env.PORT || 3000}`;
+
+// Helper function to append path to THIS_URL, handling trailing slashes
+function appendPath(baseUrl, path) {
+    const cleanBase = baseUrl.replace(/\/+$/, ''); // Remove trailing slashes
+    const cleanPath = path.replace(/^\/+/, ''); // Remove leading slashes
+    return `${cleanBase}/${cleanPath}`;
+}
 
 /**
  * Middleware to check if user is authenticated
@@ -25,10 +32,10 @@ function isAuthenticated(req, res, next) {
             next();
         } catch (err) {
             // Token expired, try to refresh
-            res.redirect(`${AUTH_URL}/oauth?refreshToken=${tokenData.refreshToken}&redirectURL=${THIS_URL}`);
+            res.redirect(`${AUTH_URL}/oauth?refreshToken=${tokenData.refreshToken}&redirectURL=${appendPath(THIS_URL, '/login')}`);
         }
     } else {
-        res.redirect(`/login?redirectURL=${THIS_URL}`);
+        res.redirect(`/login?redirectURL=${appendPath(THIS_URL, '/login')}`);
     }
 }
 
@@ -42,7 +49,7 @@ router.get('/login', async (req, res) => {
             let tokenData = jwt.decode(req.query.token);
             
             if (!tokenData) {
-                return res.redirect(`${AUTH_URL}/oauth?redirectURL=${THIS_URL}`);
+                return res.redirect(`${AUTH_URL}/oauth?redirectURL=${appendPath(THIS_URL, '/login')}`);
             }
 
             // Store token and user info in session
@@ -60,11 +67,11 @@ router.get('/login', async (req, res) => {
             res.redirect('/');
         } catch (error) {
             console.error('Login error:', error);
-            res.redirect(`${AUTH_URL}/oauth?redirectURL=${THIS_URL}`);
+            res.redirect(`${AUTH_URL}/oauth?redirectURL=${appendPath(THIS_URL, '/login')}`);
         }
     } else {
         // No token, redirect to Formbar OAuth
-        res.redirect(`${AUTH_URL}/oauth?redirectURL=${THIS_URL}`);
+        res.redirect(`${AUTH_URL}/oauth?redirectURL=${appendPath(THIS_URL, '/login')}`);
     }
 });
 
