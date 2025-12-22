@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>r/place Clone</title>
+    <title>FormPlace</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>r/place Clone</h1>
+            <h1>FormPlace</h1>
             <div class="user-info">
                 <span>Welcome, <strong><%= user.displayName %></strong></span>
                 <span class="balance">Pixels: <strong id="pixelBalance"><%= user.pixelBalance %></strong></span>
@@ -31,6 +31,7 @@
                 <div class="color-picker-container">
                     <label for="colorPicker">Choose a color:</label>
                     <input type="color" id="colorPicker" value="#FF0000">
+                    <button type="button" id="colorDropper" class="btn btn-secondary">Dropper</button>
                 </div>
 
                 <div class="purchase-section">

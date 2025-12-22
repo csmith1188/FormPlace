@@ -152,6 +152,21 @@ async function placePixel(x, y, color, userId) {
     await run('INSERT INTO canvas (x, y, color, user_id) VALUES (?, ?, ?, ?)', [x, y, color, userId]);
 }
 
+// Get the latest color at a specific coordinate (or null if none)
+async function getPixelColorAt(x, y) {
+    const rows = await query(
+        `
+        SELECT color
+        FROM canvas
+        WHERE x = ? AND y = ?
+        ORDER BY placed_at DESC
+        LIMIT 1
+        `,
+        [x, y]
+    );
+    return rows[0] ? rows[0].color : null;
+}
+
 // Create transaction record
 async function createTransaction(userId, packSize, pixelsPurchased, digipogsSpent, discountPercent) {
     await run(
@@ -186,6 +201,7 @@ module.exports = {
     getAllPixelsForReplay,
     getCanvasAs2D,
     placePixel,
+    getPixelColorAt,
     createTransaction,
     closeDB
 };

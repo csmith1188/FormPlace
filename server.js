@@ -7,7 +7,7 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const path = require('path');
 
-const { initDB, getCanvasState, placePixel, getUserById, updateUserBalance, createTransaction, getAllPixelsForReplay, getCanvasAs2D } = require('./utils/db');
+const { initDB, getCanvasState, placePixel, getUserById, updateUserBalance, createTransaction, getAllPixelsForReplay, getCanvasAs2D, getPixelColorAt } = require('./utils/db');
 const { router: authRouter, isAuthenticated } = require('./routes/auth');
 const { calculatePrice, purchasePixels } = require('./utils/digipogs');
 const { validateCoordinates, validateColor } = require('./utils/canvas');
@@ -178,21 +178,30 @@ io.on('connection', async (socket) => {
                 return;
             }
 
-            if (user.pixel_balance <= 0) {
-                socket.emit('error', { message: 'Insufficient pixel balance' });
-                return;
+            // Check current color at this coordinate
+            const existingColor = await getPixelColorAt(x, y);
+            const isSameColor = existingColor && existingColor.toLowerCase() === color.toLowerCase();
+
+            if (!isSameColor) {
+                if (user.pixel_balance <= 0) {
+                    socket.emit('error', { message: 'Insufficient pixel balance' });
+                    return;
+                }
             }
 
             // Place pixel
             await placePixel(x, y, color, socket.userId);
             
-            // Decrement balance
-            const newBalance = user.pixel_balance - 1;
-            await updateUserBalance(socket.userId, newBalance);
+            // Decrement balance only if color actually changed
+            let newBalance = user.pixel_balance;
+            if (!isSameColor) {
+                newBalance = user.pixel_balance - 1;
+                await updateUserBalance(socket.userId, newBalance);
+                socket.emit('balanceUpdate', newBalance);
+            }
 
             // Broadcast to all clients
             io.emit('canvasUpdate', { x, y, color });
-            socket.emit('balanceUpdate', newBalance);
         } catch (error) {
             console.error('Error placing pixel:', error);
             socket.emit('error', { message: 'Failed to place pixel' });

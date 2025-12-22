@@ -1,7 +1,7 @@
 {
   "name": "place-clone",
   "version": "1.0.0",
-  "description": "Reddit r/place clone with Formbar authentication",
+  "description": "Reddit FormPlace with Formbar authentication",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

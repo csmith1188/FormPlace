@@ -5,8 +5,10 @@ const socket = io();
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const colorPicker = document.getElementById('colorPicker');
+const colorDropperBtn = document.getElementById('colorDropper');
 let selectedColor = '#FF0000';
 let currentCanvas = {};
+let dropperMode = false;
 
 // Scale canvas for display (5x for 500x500 display)
 const SCALE = 5;
@@ -54,6 +56,19 @@ colorPicker.addEventListener('change', (e) => {
     selectedColor = e.target.value;
 });
 
+// Dropper button toggle
+if (colorDropperBtn) {
+    colorDropperBtn.addEventListener('click', () => {
+        dropperMode = !dropperMode;
+        colorDropperBtn.classList.toggle('active', dropperMode);
+        if (dropperMode) {
+            colorDropperBtn.textContent = 'Dropper (On)';
+        } else {
+            colorDropperBtn.textContent = 'Dropper';
+        }
+    });
+}
+
 // Canvas click handler
 canvas.addEventListener('click', (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -62,11 +77,26 @@ canvas.addEventListener('click', (e) => {
 
     // Validate coordinates
     if (x >= 0 && x < 128 && y >= 0 && y < 64) {
-        socket.emit('placePixel', {
-            x: x,
-            y: y,
-            color: selectedColor
-        });
+        const key = `${x},${y}`;
+        const existingColor = currentCanvas[key] || '#FFFFFF';
+
+        if (dropperMode) {
+            // Set selected color to the color at the clicked pixel
+            selectedColor = existingColor;
+            colorPicker.value = existingColor;
+            // Turn off dropper after picking
+            dropperMode = false;
+            if (colorDropperBtn) {
+                colorDropperBtn.classList.remove('active');
+                colorDropperBtn.textContent = 'Dropper';
+            }
+        } else {
+            socket.emit('placePixel', {
+                x: x,
+                y: y,
+                color: selectedColor
+            });
+        }
     }
 });
 
