@@ -52,16 +52,20 @@ router.get('/login', async (req, res) => {
                 return res.redirect(`${AUTH_URL}/oauth?redirectURL=${appendPath(THIS_URL, '/login')}`);
             }
 
+            // Create or update user in database using Formbar user ID
+            const formbarUserId = tokenData.userId || tokenData.id;
+            const userRecord = await createOrUpdateUser(
+                formbarUserId,
+                tokenData.displayName
+            );
+
             // Store token and user info in session
             req.session.token = tokenData;
             req.session.user = tokenData.displayName;
-            req.session.userId = tokenData.userId || tokenData.id;
-
-            // Create or update user in database
-            await createOrUpdateUser(
-                tokenData.userId || tokenData.id,
-                tokenData.displayName
-            );
+            // Use local DB user id for app logic
+            req.session.userId = userRecord.id;
+            // Keep Formbar user id separately for external transfers
+            req.session.formbarId = userRecord.formbar_id;
 
             // Redirect to home page
             res.redirect('/');
