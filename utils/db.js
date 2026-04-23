@@ -124,7 +124,7 @@ async function getAllPixelsForReplay() {
 // Get canvas as 2D array (64 rows x 128 columns) for JSON export
 async function getCanvasAs2D() {
     // Initialize 2D array with white background
-    const canvas = Array(64).fill(null).map(() => Array(128).fill('#FFFFFF'));
+    const canvas = Array(64).fill(null).map(() => Array(128).fill('#000000'));
     
     // Get the latest pixel for each coordinate
     const rows = await query(`

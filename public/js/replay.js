@@ -25,7 +25,7 @@ let currentSpeed = baseSpeed;
 
 // Initialize canvas (white)
 function initCanvas() {
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, 128, 64);
 }
 

@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FormPlace</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1>FormPlace</h1>
             <div class="user-info">
-                <span>Welcome, <strong><%= user.displayName %></strong></span>
-                <span class="balance">Pixels: <strong id="pixelBalance"><%= user.pixelBalance %></strong></span>
+                <span>Welcome, <strong>
+                        <%= user.displayName %>
+                    </strong></span>
+                <span class="balance">Pixels: <strong id="pixelBalance">
+                        <%= user.pixelBalance %>
+                    </strong></span>
                 <a href="/replay" class="btn btn-secondary">View Replay</a>
+                <a href="https://github.com/csmith1188/FormPlace" class="btn btn-secondary">Github Repo</a>
                 <a href="/logout" class="btn btn-secondary">Logout</a>
             </div>
         </header>
@@ -23,14 +30,16 @@
                 <canvas id="canvas" width="128" height="64"></canvas>
                 <div class="canvas-info">
                     <p>Click on the canvas to place a pixel</p>
-                    <p>You have <strong id="pixelBalanceText"><%= user.pixelBalance %></strong> pixels remaining</p>
+                    <p>You have <strong id="pixelBalanceText">
+                            <%= user.pixelBalance %>
+                        </strong> pixels remaining</p>
                 </div>
             </div>
 
             <div class="controls">
                 <div class="color-picker-container">
                     <label for="colorPicker">Choose a color:</label>
-                    <input type="color" id="colorPicker" value="#FF0000">
+                    <input type="color" id="colorPicker" value="#FFFFFF">
                     <button type="button" id="colorDropper" class="btn btn-secondary">Dropper</button>
                 </div>
 
@@ -39,19 +48,19 @@
                     <div class="pixel-packs">
                         <button class="pack-btn" data-pack="10">
                             <div class="pack-size">10 Pixels</div>
-                            <div class="pack-price">20 Digipogs</div>
+                            <div class="pack-price">10 Digipogs</div>
                         </button>
                         <button class="pack-btn" data-pack="25">
                             <div class="pack-size">25 Pixels</div>
-                            <div class="pack-price">45 Digipogs (10% off)</div>
+                            <div class="pack-price">22.5 Digipogs (10% off)</div>
                         </button>
                         <button class="pack-btn" data-pack="50">
                             <div class="pack-size">50 Pixels</div>
-                            <div class="pack-price">85 Digipogs (15% off)</div>
+                            <div class="pack-price">42.5 Digipogs (15% off)</div>
                         </button>
                         <button class="pack-btn" data-pack="100">
                             <div class="pack-size">100 Pixels</div>
-                            <div class="pack-price">160 Digipogs (20% off)</div>
+                            <div class="pack-price">80 Digipogs (20% off)</div>
                         </button>
                     </div>
                 </div>
@@ -67,7 +76,8 @@
             <p id="packInfo"></p>
             <form id="purchaseForm">
                 <label for="pin">Enter your PIN:</label>
-                <input type="password" id="pin" name="pin" required minlength="4" maxlength="6" pattern="[0-9]{4,6}" placeholder="4-6 digits">
+                <input type="password" id="pin" name="pin" required minlength="4" maxlength="6" pattern="[0-9]{4,6}"
+                    placeholder="4-6 digits">
                 <div class="modal-buttons">
                     <button type="submit" class="btn btn-primary">Purchase</button>
                     <button type="button" class="btn btn-secondary" id="cancelPurchase">Cancel</button>
@@ -80,10 +90,10 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         // Initialize canvas with current state
-        const canvasState = <%- JSON.stringify(canvasState) %>;
+        const canvasState = <% - JSON.stringify(canvasState) %>;
         const userId = <%= user.userId %>;
     </script>
     <script src="/js/client.js"></script>
 </body>
-</html>
 
+</html>

@@ -6,9 +6,21 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const colorPicker = document.getElementById('colorPicker');
 const colorDropperBtn = document.getElementById('colorDropper');
-let selectedColor = '#FF0000';
+let selectedColor = '#FFFFFF';
 let currentCanvas = {};
 let dropperMode = false;
+
+function setDropperMode(enabled) {
+    dropperMode = enabled;
+
+    if (!colorDropperBtn) {
+        return;
+    }
+
+    colorDropperBtn.classList.toggle('active', enabled);
+    colorDropperBtn.textContent = enabled ? 'Dropper (On)' : 'Dropper';
+    canvas.style.cursor = enabled ? 'copy' : 'crosshair';
+}
 
 // Scale canvas for display (5x for 500x500 display)
 const SCALE = 5;
@@ -21,7 +33,7 @@ function initCanvas() {
     // Create a white canvas
     for (let y = 0; y < 64; y++) {
         for (let x = 0; x < 128; x++) {
-            currentCanvas[`${x},${y}`] = '#FFFFFF';
+            currentCanvas[`${x},${y}`] = '#000000';
         }
     }
     drawCanvas();
@@ -30,7 +42,7 @@ function initCanvas() {
 // Draw the canvas
 function drawCanvas() {
     // Clear canvas
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, 128, 64);
 
     // Draw all pixels
@@ -59,13 +71,7 @@ colorPicker.addEventListener('change', (e) => {
 // Dropper button toggle
 if (colorDropperBtn) {
     colorDropperBtn.addEventListener('click', () => {
-        dropperMode = !dropperMode;
-        colorDropperBtn.classList.toggle('active', dropperMode);
-        if (dropperMode) {
-            colorDropperBtn.textContent = 'Dropper (On)';
-        } else {
-            colorDropperBtn.textContent = 'Dropper';
-        }
+        setDropperMode(!dropperMode);
     });
 }
 
@@ -78,18 +84,14 @@ canvas.addEventListener('click', (e) => {
     // Validate coordinates
     if (x >= 0 && x < 128 && y >= 0 && y < 64) {
         const key = `${x},${y}`;
-        const existingColor = currentCanvas[key] || '#FFFFFF';
+        const existingColor = currentCanvas[key] || '#000000';
 
         if (dropperMode) {
             // Set selected color to the color at the clicked pixel
             selectedColor = existingColor;
             colorPicker.value = existingColor;
             // Turn off dropper after picking
-            dropperMode = false;
-            if (colorDropperBtn) {
-                colorDropperBtn.classList.remove('active');
-                colorDropperBtn.textContent = 'Dropper';
-            }
+            setDropperMode(false);
         } else {
             socket.emit('placePixel', {
                 x: x,
@@ -97,6 +99,13 @@ canvas.addEventListener('click', (e) => {
                 color: selectedColor
             });
         }
+    }
+});
+
+// Escape cancels dropper mode
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dropperMode) {
+        setDropperMode(false);
     }
 });
 
@@ -136,13 +145,17 @@ packButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         selectedPackSize = parseInt(btn.dataset.pack);
         const packData = {
-            10: { price: 20, discount: '0%' },
-            25: { price: 45, discount: '10%' },
-            50: { price: 85, discount: '15%' },
-            100: { price: 160, discount: '20%' }
+            10: { price: 10, discount: '0%' },
+            25: { price: 22.5, discount: '10%' },
+            50: { price: 42.5, discount: '15%' },
+            100: { price: 80, discount: '20%' }
         };
         const data = packData[selectedPackSize];
-        packInfo.textContent = `Purchase ${selectedPackSize} pixels for ${data.price} Digipogs (${data.discount} discount)`;
+        if (data.discount === '0%') {
+            packInfo.textContent = `Purchase ${selectedPackSize} pixels for ${data.price} Digipogs`;
+        } else {
+            packInfo.textContent = `Purchase ${selectedPackSize} pixels for ${data.price} Digipogs (${data.discount} discount)`;
+        }
         purchaseMessage.textContent = '';
         purchaseModal.style.display = 'block';
     });

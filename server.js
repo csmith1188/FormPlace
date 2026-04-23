@@ -6,6 +6,7 @@ const ioClient = require('socket.io-client');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const path = require('path');
+const { PNG } = require('pngjs');
 
 const { initDB, getCanvasState, placePixel, getUserById, updateUserBalance, createTransaction, getAllPixelsForReplay, getCanvasAs2D, getPixelColorAt } = require('./utils/db');
 const { router: authRouter, isAuthenticated } = require('./routes/auth');
@@ -21,6 +22,98 @@ const AUTH_URL = process.env.AUTH_URL || 'https://formbar.yorktechapps.com';
 const THIS_URL = process.env.THIS_URL || `http://localhost:${PORT}`;
 const API_KEY = process.env.API_KEY || '';
 const APP_ACCOUNT_ID = parseInt(process.env.APP_ACCOUNT_ID || '0'); // Formbar account ID to receive digipogs
+
+function compressCanvas2D(canvas2D) {
+    const flatPixels = canvas2D.flat();
+    const palette = [];
+    const paletteLookup = new Map();
+    const indexedPixels = [];
+
+    for (const color of flatPixels) {
+        if (!paletteLookup.has(color)) {
+            paletteLookup.set(color, palette.length);
+            palette.push(color);
+        }
+        indexedPixels.push(paletteLookup.get(color));
+    }
+
+    const runs = [];
+    let currentAlias = indexedPixels[0];
+    let runLength = 1;
+
+    for (let i = 1; i < indexedPixels.length; i += 1) {
+        const alias = indexedPixels[i];
+        if (alias === currentAlias) {
+            runLength += 1;
+        } else {
+            runs.push([runLength, currentAlias]);
+            currentAlias = alias;
+            runLength = 1;
+        }
+    }
+
+    if (indexedPixels.length > 0) {
+        runs.push([runLength, currentAlias]);
+    }
+
+    return {
+        encoding: 'palette-rle-v1',
+        palette,
+        runs,
+        pixelCount: indexedPixels.length
+    };
+}
+
+function normalizeHexColor(hex) {
+    if (typeof hex !== 'string') {
+        return '#000000';
+    }
+
+    const normalized = hex.trim();
+    if (/^#[A-Fa-f0-9]{6}$/.test(normalized)) {
+        return normalized;
+    }
+
+    if (/^#[A-Fa-f0-9]{3}$/.test(normalized)) {
+        const r = normalized[1];
+        const g = normalized[2];
+        const b = normalized[3];
+        return `#${r}${r}${g}${g}${b}${b}`;
+    }
+
+    return '#000000';
+}
+
+function canvas2DToPngBuffer(canvas2D, scale = 1) {
+    const sourceWidth = 128;
+    const sourceHeight = 64;
+    const outputWidth = sourceWidth * scale;
+    const outputHeight = sourceHeight * scale;
+    const png = new PNG({ width: outputWidth, height: outputHeight });
+
+    for (let y = 0; y < sourceHeight; y += 1) {
+        for (let x = 0; x < sourceWidth; x += 1) {
+            const color = normalizeHexColor(canvas2D[y][x]);
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+
+            for (let dy = 0; dy < scale; dy += 1) {
+                for (let dx = 0; dx < scale; dx += 1) {
+                    const outX = x * scale + dx;
+                    const outY = y * scale + dy;
+                    const idx = (outputWidth * outY + outX) << 2;
+                    png.data[idx] = r;
+                    png.data[idx + 1] = g;
+                    png.data[idx + 2] = b;
+                    png.data[idx + 3] = 255;
+                }
+            }
+        }
+    }
+
+    return PNG.sync.write(png);
+}
 
 // Create Socket.io client connection to Formbar for Digipogs transfers
 let formbarSocket = null;
@@ -113,7 +206,7 @@ app.get('/replay', async (req, res) => {
 });
 
 // Canvas image data as JSON (no authentication required)
-app.get('/api/canvas.json', async (req, res) => {
+app.get('/api/canvas/full', async (req, res) => {
     try {
         const canvas = await getCanvasAs2D();
         res.json({
@@ -123,6 +216,49 @@ app.get('/api/canvas.json', async (req, res) => {
         });
     } catch (error) {
         console.error('Error getting canvas data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Canvas image data as compressed JSON (no authentication required)
+app.get('/api/canvas/compressed', async (req, res) => {
+    try {
+        const canvas = await getCanvasAs2D();
+        const compressed = compressCanvas2D(canvas);
+        res.json({
+            width: 128,
+            height: 64,
+            ...compressed
+        });
+    } catch (error) {
+        console.error('Error getting compressed canvas data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Raw JavaScript decompressor helper (no authentication required)
+app.get('/api/canvas/decompress', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'js', 'canvas-decompress.js'));
+});
+
+// Canvas image as PNG (no authentication required)
+app.get('/api/canvas/png', async (req, res) => {
+    try {
+        const rawScale = req.query.scale;
+        const scale = rawScale === undefined ? 1 : Number.parseInt(rawScale, 10);
+        if (!Number.isInteger(scale) || scale < 1 || scale > 32) {
+            return res.status(400).json({
+                error: 'Invalid scale. Use an integer between 1 and 32.'
+            });
+        }
+
+        const canvas = await getCanvasAs2D();
+        const pngBuffer = canvas2DToPngBuffer(canvas, scale);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'no-store');
+        res.send(pngBuffer);
+    } catch (error) {
+        console.error('Error getting canvas PNG:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

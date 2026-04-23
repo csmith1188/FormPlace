@@ -112,7 +112,7 @@ main {
 
 .pixel-packs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: 1fr;
     gap: 15px;
 }
 
@@ -178,6 +178,12 @@ main {
 
 .btn-secondary:hover {
     background: #5a6268;
+}
+
+#colorDropper.active {
+    background: #0d6efd;
+    color: white;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 
 /* Modal Styles */

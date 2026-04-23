@@ -35,7 +35,7 @@ function validateColor(color) {
  * @returns {Array} 2D array [y][x] = color
  */
 function canvasStateTo2D(canvasState) {
-    const canvas = Array(64).fill(null).map(() => Array(128).fill('#FFFFFF'));
+    const canvas = Array(64).fill(null).map(() => Array(128).fill('#000000'));
     
     for (const pixel of canvasState) {
         if (pixel.x >= 0 && pixel.x < 128 && pixel.y >= 0 && pixel.y < 64) {

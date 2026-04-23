@@ -1,9 +1,9 @@
-// Pricing table with bulk discounts
+// Pricing table (base rate: 1 Digipog per pixel + tier discounts)
 const PRICING = {
-    10: { pricePerPixel: 2.0, totalPrice: 20, discount: 0 },
-    25: { pricePerPixel: 1.8, totalPrice: 45, discount: 10 },
-    50: { pricePerPixel: 1.7, totalPrice: 85, discount: 15 },
-    100: { pricePerPixel: 1.6, totalPrice: 160, discount: 20 }
+    10: { pricePerPixel: 1.0, totalPrice: 10, discount: 0 },
+    25: { pricePerPixel: 0.9, totalPrice: 22.5, discount: 10 },
+    50: { pricePerPixel: 0.85, totalPrice: 42.5, discount: 15 },
+    100: { pricePerPixel: 0.8, totalPrice: 80, discount: 20 }
 };
 
 /**
