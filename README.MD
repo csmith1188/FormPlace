@@ -45,6 +45,8 @@ FormPlace is a collaborative pixel canvas app inspired by r/place, using Formbar
    SESSION_SECRET=replace-with-a-strong-secret
    API_KEY=
    APP_ACCOUNT_ID=0
+   API_RATE_LIMIT_WINDOW_MS=60000
+   API_RATE_LIMIT_MAX=120
    ```
 
 4. Start the app:
@@ -63,6 +65,8 @@ FormPlace is a collaborative pixel canvas app inspired by r/place, using Formbar
 - `SESSION_SECRET`: Session signing secret
 - `API_KEY`: API key used to connect to Formbar Socket endpoint
 - `APP_ACCOUNT_ID`: Formbar account ID that receives Digipogs payments
+- `API_RATE_LIMIT_WINDOW_MS`: Rate-limit window size for `/api/*` routes in milliseconds (default `60000`)
+- `API_RATE_LIMIT_MAX`: Max `/api/*` requests allowed per IP during each window (default `120`)
 
 ## App Routes
 
@@ -74,6 +78,8 @@ FormPlace is a collaborative pixel canvas app inspired by r/place, using Formbar
 ## Canvas API Documentation
 
 All canvas API routes are currently public (no auth required).
+
+All `/api/*` routes are rate limited per IP. When the limit is exceeded, the API returns HTTP `429`.
 
 ### `GET /api/canvas/full`
 

@@ -6,6 +6,7 @@ const ioClient = require('socket.io-client');
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 const { PNG } = require('pngjs');
 
 const { initDB, getCanvasState, placePixel, getUserById, updateUserBalance, createTransaction, getAllPixelsForReplay, getCanvasAs2D, getPixelColorAt } = require('./utils/db');
@@ -22,6 +23,19 @@ const AUTH_URL = process.env.AUTH_URL || 'https://formbar.yorktechapps.com';
 const THIS_URL = process.env.THIS_URL || `http://localhost:${PORT}`;
 const API_KEY = process.env.API_KEY || '';
 const APP_ACCOUNT_ID = parseInt(process.env.APP_ACCOUNT_ID || '0'); // Formbar account ID to receive digipogs
+
+function getPositiveIntEnv(name, fallback) {
+    const rawValue = process.env[name];
+    if (!rawValue) {
+        return fallback;
+    }
+
+    const parsed = Number.parseInt(rawValue, 10);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+const API_RATE_LIMIT_WINDOW_MS = getPositiveIntEnv('API_RATE_LIMIT_WINDOW_MS', 60 * 1000);
+const API_RATE_LIMIT_MAX = getPositiveIntEnv('API_RATE_LIMIT_MAX', 120);
 
 function compressCanvas2D(canvas2D) {
     const flatPixels = canvas2D.flat();
@@ -163,6 +177,18 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// API rate limiting (all /api routes)
+const apiRateLimiter = rateLimit({
+    windowMs: API_RATE_LIMIT_WINDOW_MS,
+    max: API_RATE_LIMIT_MAX,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: {
+        error: 'Too many requests. Please try again shortly.'
+    }
+});
+app.use('/api', apiRateLimiter);
 
 // Routes
 app.use('/', authRouter);
